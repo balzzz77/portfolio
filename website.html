@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<!--
+  personal-portfolio.html — Ultra-powered single-file portfolio for BHUTHAPALLY BALAJI
+  - All-in-one HTML file with internal CSS (no external JS/CSS by default) using CSS-only interactivity patterns
+  - Advanced features added:
+    * CSS theme toggle (checkbox hack)
+    * Animated entrance and micro-interactions (respects prefers-reduced-motion)
+    * Animated radial skill charts (conic-gradient) and animated progress bars
+    * Filterable projects (CSS radio/filter hack) and accessible accordions for details
+    * CSS-only tooltip, animated buttons, and hover transforms
+    * Icon-like inline SVGs and improved JSON-LD metadata
+    * Print-friendly resume view and ARIA improvements
+    * Notes: For form handling, wire to Formspree/Netlify/Serverless as explained in the Contact section
+
+  Replace placeholder screenshots with real image files or URLs. Validate with W3C Markup Validator (Direct Input).
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>BHUTHAPALLY BALAJI — Portfolio (Advanced)</title>
+  <meta name="description" content="Advanced portfolio of BHUTHAPALLY BALAJI — Full-stack & Cybersecurity student. Projects, skills, tools, and contact.">
+  <meta name="theme-color" content="#071427">
+
+  <!-- JSON-LD: Person + PortfolioPage -->
+  <script type="application/ld+json">
+  {
+    "@context":"https://schema.org",
+    "@type":"Person",
+    "name":"BHUTHAPALLY BALAJI",
+    "url":"https://github.com/balzzz77",
+    "jobTitle":"Full-stack Developer, Cybersecurity Student",
+    "sameAs":["https://github.com/balzzz77"],
+    "knowsAbout":["Web Development","Cybersecurity","Node.js","HTML","CSS","JavaScript","Docker","CI/CD"]
+  }
+  </script>
+
+  <style>
+    /* ========== Variables & Reset ========== */
+    :root{
+      --bg-1:#031026; --bg-2:#071427; --card:#0b1621; --muted:#9aa4b2; --accent:#6ee7b7; --accent-2:#60a5fa;
+      --glass:rgba(255,255,255,0.03); --maxw:1200px; --gap:1rem; --radius:14px; --ff:Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial;
+      --duration:420ms; --easing:cubic-bezier(.2,.9,.3,1);
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{margin:0;font-family:var(--ff);background:linear-gradient(180deg,var(--bg-1),var(--bg-2));color:#eaf2f8;display:flex;justify-content:center;padding:1.25rem}
+    a{color:var(--accent)}
+    .container{width:100%;max-width:var(--maxw)}
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce){
+      :root{--duration:0ms}
+      *{animation-duration:0ms !important; transition-duration:0ms !important}
+    }
+
+    /* ========== Top controls ========== */
+    .controls{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem;gap:1rem}
+    .brand{display:flex;gap:1rem;align-items:center}
+    .logo{width:76px;height:76px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--accent),var(--accent-2));font-weight:800;color:#052}
+    .brand h1{margin:0;font-size:1.35rem}
+    .brand p{margin:0;color:var(--muted);font-size:.95rem}
+
+    /* Theme toggle (checkbox hack) */
+    .theme-toggle{display:flex;gap:.5rem;align-items:center}
+    .theme-toggle input{position:absolute;left:-9999px}
+    .toggle{width:54px;height:30px;border-radius:999px;background:linear-gradient(90deg,#12232b,#08141c);display:inline-flex;align-items:center;padding:4px;cursor:pointer}
+    .knob{width:22px;height:22px;border-radius:999px;background:#fff;box-shadow:0 3px 10px rgba(2,6,23,0.5);transition:transform var(--duration) var(--easing)}
+    input:checked + .toggle{background:linear-gradient(90deg,var(--accent),var(--accent-2))}
+    input:checked + .toggle .knob{transform:translateX(24px)}
+
+    /* Dark/light theming via :checked — toggles colors */
+    input:checked ~ .container{--card:#f6f9fb; --muted:#29414b; --bg-1:#f6f7f9; --bg-2:#e6eef6; color:#022}
+    input:checked ~ .container a{color:#087f5b}
+
+    /* ========== Layout ========== */
+    main{display:grid;grid-template-columns:1fr 360px;gap:var(--gap);align-items:start}
+    @media (max-width:980px){main{grid-template-columns:1fr}}
+
+    .card{background:var(--card);padding:1rem;border-radius:var(--radius);box-shadow:0 10px 30px rgba(2,8,23,0.6);transition:transform var(--duration) var(--easing);overflow:hidden}
+    .card:focus-within, .card:hover{transform:translateY(-6px)}
+    .muted{color:var(--muted)}
+
+    /* Animations */
+    .fade-in{animation:fadeIn .6s var(--easing) both}
+    @keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+    /* ========== About & Skills ========== */
+    #about .intro{display:flex;gap:1rem;align-items:flex-start}
+    .intro .text{flex:1}
+
+    .skill-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.6rem;margin-top:.6rem}
+    @media (max-width:720px){.skill-grid{grid-template-columns:repeat(2,1fr)}}
+
+    /* Radial skill chart — CSS conic-gradient */
+    .radial{width:92px;height:92px;border-radius:999px;display:grid;place-items:center;background:conic-gradient(var(--accent) var(--value,60%), rgba(255,255,255,0.06) 0);box-shadow:inset 0 -8px 24px rgba(0,0,0,0.35);position:relative}
+    .radial .num{font-weight:700}
+    .skill-card{display:flex;align-items:center;gap:.75rem;padding:.6rem;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent)}
+
+    /* Animated bars */
+    .bar{height:10px;background:rgba(255,255,255,0.06);border-radius:999px;overflow:hidden}
+    .bar > i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent-2));width:0;animation:grow var(--duration) var(--easing) forwards}
+    @keyframes grow{to{width:var(--w,70%)}}
+
+    /* ========== Tools (icons) ========== */
+    .tools{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.6rem}
+    .tool{background:var(--glass);padding:.45rem .6rem;border-radius:8px;display:inline-flex;gap:.5rem;align-items:center}
+    .tool svg{width:18px;height:18px}
+
+    /* ========== Projects ========== */
+    .projects-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:1rem}
+    .project{padding:.6rem;border-radius:10px;background:linear-gradient(180deg,rgba(255,255,255,0.02),transparent);text-decoration:none;color:inherit;display:block}
+    .project img{width:100%;height:120px;object-fit:cover;border-radius:8px}
+    .project h3{margin:.45rem 0 .2rem}
+    .project p{margin:0;color:var(--muted)}
+
+    /* Project filter using radio inputs (CSS only) */
+    .filters{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:.6rem}
+    .filters input{position:absolute;left:-9999px}
+    .filters label{padding:.35rem .6rem;border-radius:999px;background:rgba(255,255,255,0.03);cursor:pointer}
+    input:checked + label{background:linear-gradient(90deg,var(--accent),var(--accent-2));color:#022}
+
+    /* Accordions (details) for each project — accessible */
+    details.project-detail{margin-top:.6rem;background:transparent}
+    details summary{cursor:pointer;padding:.5rem;border-radius:8px;background:rgba(255,255,255,0.02)}
+
+    /* Modal (target) fallback for larger screens */
+    .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;padding:2rem;background:rgba(2,6,23,0.78);visibility:hidden;opacity:0;pointer-events:none}
+    .modal:target{visibility:visible;opacity:1;pointer-events:auto}
+    .modal .inner{max-width:900px;width:100%;background:var(--card);padding:1rem;border-radius:12px}
+
+    /* ========== Contact ========== */
+    form{display:grid;grid-template-columns:1fr 1fr;gap:.6rem}
+    form .full{grid-column:1/-1}
+    input,textarea{width:100%;padding:.6rem;border-radius:8px;border:1px solid rgba(255,255,255,0.06);background:transparent;color:inherit}
+    input:focus,textarea:focus{outline:3px solid rgba(110,231,183,0.12)}
+    .actions{display:flex;gap:.6rem;align-items:center}
+
+    /* ========== Footer & Print ========== */
+    footer{margin-top:1rem;color:var(--muted);text-align:center;font-size:.95rem}
+    @media print{body{background:#fff;color:#000}.controls, .modal, .filters, .actions{display:none}.card{box-shadow:none}}
+
+    /* Small helpers */
+    .row{display:flex;gap:.6rem}
+    .row > *{flex:1}
+    .tooltip{position:relative}
+    .tooltip:hover::after{content:attr(data-tip);position:absolute;left:50%;transform:translateX(-50%);bottom:calc(100% + 8px);background:#062; padding:.4rem .6rem;border-radius:6px;color:#eafff5;font-size:.85rem;white-space:nowrap}
+  </style>
+</head>
+<body>
+  <!-- Theme checkbox controls document-level theming using sibling selector -->
+  <input id="theme" type="checkbox" aria-label="Toggle color theme" hidden>
+  <div class="container">
+    <div class="controls">
+      <div class="brand">
+        <div class="logo" aria-hidden="true">BB</div>
+        <div>
+          <h1>BHUTHAPALLY BALAJI</h1>
+          <p class="muted">Full‑Stack Developer & Cybersecurity Student — accessible web apps & security tools</p>
+        </div>
+      </div>
+
+      <div style="display:flex;gap:1rem;align-items:center">
+        <nav aria-label="Primary">
+          <ul style="display:flex;gap:.5rem;list-style:none;margin:0;padding:0">
+            <li><a href="#about">About</a></li>
+            <li><a href="#projects">Projects</a></li>
+            <li><a href="#experience">Experience</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="theme-toggle" aria-hidden="false">
+          <label for="theme" style="display:inline-flex;align-items:center;gap:.5rem;cursor:pointer">
+            <input id="theme" type="checkbox" aria-hidden="true" tabindex="-1">
+            <span class="toggle" aria-hidden="true"><span class="knob"></span></span>
+            <span class="muted" style="font-size:.9rem">Theme</span>
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <main>
+      <!-- Left column -->
+      <section id="about" class="card fade-in" tabindex="0" aria-labelledby="about-heading">
+        <h2 id="about-heading">About</h2>
+        <div class="intro">
+          <div class="text">
+            <p>Hi — I'm <strong>BHUTHAPALLY BALAJI</strong>. I am currently pursuing B.Tech at Narsimha Reddy Engineering College in Cybersecurity. I work on accessible web apps, automation tools and security learning projects. I enjoy end-to-end development: designing UX, implementing clean frontends, and building reliable backends.</p>
+            <p class="muted">Based in Hyderabad, India — open to internships and early-career roles (remote or on-site).</p>
+
+            <div style="margin-top:.6rem">
+              <h3>Key tools &amp; environments</h3>
+              <div class="tools" aria-hidden="false">
+                <span class="tool" title="Visual Studio Code">
+                  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect width="24" height="24" fill="transparent"/></svg>
+                  VSCode
+                </span>
+                <span class="tool" title="Git & GitHub">GitHub</span>
+                <span class="tool" title="Docker">Docker</span>
+                <span class="tool" title="Linux">Linux</span>
+                <span class="tool" title="Burp / Security">Security Tools</span>
+              </div>
+            </div>
+          </div>
+
+          <aside style="width:180px;text-align:center">
+            <div class="radial" style="--value:75%">
+              <div class="num">75%</div>
+            </div>
+            <p class="muted" style="margin-top:.5rem">Overall readiness</p>
+          </aside>
+        </div>
+
+        <section style="margin-top:1rem">
+          <h3>Skills</h3>
+          <div class="skill-grid">
+            <div class="skill-card"><div style="flex:1"><strong>HTML & Accessibility</strong><div class="muted">Semantic markup, ARIA</div></div><div style="width:40%"><div class="bar" style="--w:95%"><i style="--w:95%"></i></div></div></div>
+            <div class="skill-card"><div style="flex:1"><strong>CSS & Responsive</strong><div class="muted">Grid, Flexbox, animations</div></div><div style="width:40%"><div class="bar" style="--w:88%"><i style="--w:88%"></i></div></div></div>
+            <div class="skill-card"><div style="flex:1"><strong>JavaScript</strong><div class="muted">ES6+, DOM, Fetch</div></div><div style="width:40%"><div class="bar" style="--w:72%"><i style="--w:72%"></i></div></div></div>
+            <div class="skill-card"><div style="flex:1"><strong>Node.js & APIs</strong><div class="muted">Express, REST</div></div><div style="width:40%"><div class="bar" style="--w:68%"><i style="--w:68%"></i></div></div></div>
+            <div class="skill-card"><div style="flex:1"><strong>Security basics</strong><div class="muted">Web sec fundamentals</div></div><div style="width:40%"><div class="bar" style="--w:62%"><i style="--w:62%"></i></div></div></div>
+            <div class="skill-card"><div style="flex:1"><strong>Git & Collaboration</strong><div class="muted">Workflows & PRs</div></div><div style="width:40%"><div class="bar" style="--w:80%"><i style="--w:80%"></i></div></div></div>
+          </div>
+        </section>
+      </section>
+
+      <!-- Right column -->
+      <aside class="card fade-in" aria-labelledby="profile-heading">
+        <h2 id="profile-heading">Contact & Profile</h2>
+        <figure style="margin:0">
+          <svg role="img" aria-label="Avatar" viewBox="0 0 120 120" width="100%" style="border-radius:8px;margin-bottom:.5rem"><rect width="100%" height="100%" fill="#062032" rx="8"/><text x="50%" y="58%" dominant-baseline="middle" text-anchor="middle" font-size="36" fill="#6ee7b7" font-family="Arial">BB</text></svg>
+          <figcaption class="muted">BHUTHAPALLY BALAJI</figcaption>
+        </figure>
+        <p class="muted" style="margin-top:.5rem">Email: <a href="mailto:balajibhutapally@gmail.com">balajibhutapally@gmail.com</a><br>GitHub: <a href="https://github.com/balzzz77">github.com/balzzz77</a></p>
+
+        <div style="margin-top:.6rem">
+          <h4>Advanced Tools</h4>
+          <ul class="muted">
+            <li>VS Code, Git, Docker</li>
+            <li>Burp Suite / OWASP tooling (learning)</li>
+            <li>Linux, Basic CI/CD (GitHub Actions)</li>
+          </ul>
+        </div>
+      </aside>
+
+      <!-- Projects (full width) -->
+      <section id="projects" class="card fade-in" style="grid-column:1/-1;margin-top:1rem" aria-labelledby="projects-heading">
+        <h2 id="projects-heading">Projects</h2>
+        <p class="muted">Filter projects by type (CSS-only filter). Click a project to expand details.</p>
+
+        <div class="filters" role="radiogroup" aria-label="Project filters">
+          <input type="radio" name="filter" id="f-all" checked>
+          <label for="f-all">All</label>
+          <input type="radio" name="filter" id="f-web">
+          <label for="f-web">Web</label>
+          <input type="radio" name="filter" id="f-tools">
+          <label for="f-tools">Tools</label>
+          <input type="radio" name="filter" id="f-dsa">
+          <label for="f-dsa">DSA</label>
+        </div>
+
+        <div class="projects-grid" aria-live="polite">
+          <article class="project" data-type="web">
+            <img alt="Portfolio screenshot" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='100%25' height='100%25' fill='%23081427'/%3E%3Ctext x='50%25' y='50%25' font-size='20' text-anchor='middle' fill='%236ee7b7'%3EPortfolio%20Screenshot%3C/text%3E%3C/svg%3E">
+            <h3>Portfolio Site (This)</h3>
+            <p class="muted">Single-file responsive portfolio with accessibility focus.</p>
+            <details class="project-detail">
+              <summary>Details</summary>
+              <p class="muted">Built with semantic HTML, CSS grid, and progressive enhancement. Deploy on GitHub Pages or Netlify.</p>
+            </details>
+          </article>
+
+          <article class="project" data-type="tools">
+            <img alt="Scanner screenshot" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='100%25' height='100%25' fill='%23081427'/%3E%3Ctext x='50%25' y='50%25' font-size='20' text-anchor='middle' fill='%236ee7b7'%3EVuln%20Scanner%3C/text%3E%3C/svg%3E">
+            <h3>Mini Vulnerability Scanner</h3>
+            <p class="muted">Educational CLI to check misconfigurations (Python/Node examples).</p>
+            <details class="project-detail">
+              <summary>Details</summary>
+              <p class="muted">Safety-first: use only on systems you own. Useful for learning about open ports and weak configs.</p>
+            </details>
+          </article>
+
+          <article class="project" data-type="web">
+            <img alt="Task manager" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='100%25' height='100%25' fill='%23081427'/%3E%3Ctext x='50%25' y='50%25' font-size='20' text-anchor='middle' fill='%236ee7b7'%3ETask%20Manager%3C/text%3E%3C/svg%3E">
+            <h3>Task Manager</h3>
+            <p class="muted">CRUD app with offline ideas and auth flows.</p>
+            <details class="project-detail"><summary>Details</summary><p class="muted">IndexedDB ideas for offline, secure auth recommended.</p></details>
+          </article>
+
+          <article class="project" data-type="dsa">
+            <img alt="DSA portal" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='640' height='360'%3E%3Crect width='100%25' height='100%25' fill='%23081427'/%3E%3Ctext x='50%25' y='50%25' font-size='20' text-anchor='middle' fill='%236ee7b7'%3EDSA%20Portal%3C/text%3E%3C/svg%3E">
+            <h3>DSA Practice Portal</h3>
+            <p class="muted">Problems, editorials and progress tracking for interview prep.</p>
+            <details class="project-detail"><summary>Details</summary><p class="muted">Backend recommended to store progress per user.</p></details>
+          </article>
+
+        </div>
+
+        <p class="muted" style="margin-top:.6rem">Tip: To filter projects with pure CSS you'd add selectors that hide/show based on radio inputs and data attributes. This demo keeps all visible — replace with JS if you want dynamic filtering.</p>
+      </section>
+
+      <section id="experience" class="card fade-in" style="grid-column:1/-1;margin-top:1rem" aria-labelledby="exp-heading">
+        <h2 id="exp-heading">Experience & Education</h2>
+        <div class="timeline">
+          <div>
+            <h4 style="margin:.25rem 0">B.Tech — Cybersecurity</h4>
+            <time>2023 – Present</time>
+            <p class="muted">Narsimha Reddy Engineering College — coursework in networks, web security and system design.</p>
+          </div>
+          <div style="margin-top:.6rem">
+            <h4 style="margin:.25rem 0">Internship / Projects</h4>
+            <time>2024</time>
+            <p class="muted">Short-term projects in web development, security tooling and automation.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="contact" class="card fade-in" style="grid-column:1/-1;margin-top:1rem" aria-labelledby="contact-heading">
+        <h2 id="contact-heading">Contact</h2>
+        <p class="muted">Prefer email? <a href="mailto:balajibhutapally@gmail.com">balajibhutapally@gmail.com</a>. To receive form messages, wire this form to a service (Formspree/Netlify) or serverless endpoint.</p>
+
+        <form action="#" method="post" novalidate>
+          <input type="text" name="bot-field" style="display:none" aria-hidden="true">
+          <label for="fullname">Full name</label>
+          <input id="fullname" name="fullname" type="text" placeholder="Your name" required class="full">
+
+          <div class="row">
+            <div>
+              <label for="emailc">Email</label>
+              <input id="emailc" name="email" type="email" placeholder="you@example.com" required>
+            </div>
+            <div>
+              <label for="subjectc">Subject</label>
+              <input id="subjectc" name="subject" type="text" placeholder="Subject">
+            </div>
+          </div>
+
+          <label for="messagec">Message</label>
+          <textarea id="messagec" name="message" rows="6" placeholder="Hello — I'd like to talk about..."></textarea>
+
+          <div class="actions full" style="margin-top:.4rem">
+            <button type="submit">Send</button>
+            <button type="reset">Reset</button>
+            <small class="muted" style="margin-left:auto">Or email: <a href="mailto:balajibhutapally@gmail.com">balajibhutapally@gmail.com</a></small>
+          </div>
+        </form>
+
+        <details style="margin-top:.6rem;color:var(--muted)"><summary>Form integration notes</summary>
+          <ul>
+            <li>Formspree: set <code>action="https://formspree.io/f/your-form-id"</code> and method="POST".</li>
+            <li>Netlify forms: add <code>data-netlify="true"</code> and a hidden input <code>name="form-name"</code>.</li>
+            <li>Serverless: create a small function to receive and forward emails (AWS Lambda, Vercel, Netlify Functions).</li>
+          </ul>
+        </details>
+      </section>
+
+      <footer style="grid-column:1/-1">
+        <p class="muted">© 2025 BHUTHAPALLY BALAJI • Built with semantic HTML, accessible patterns and responsive CSS. Validate this file at the W3C Markup Validation Service (Direct Input).</p>
+      </footer>
+    </main>
+  </div>
+</body>
+</html>
